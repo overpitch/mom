@@ -1,4 +1,4 @@
-.PHONY: magic magic.wasm lbxdump wasm itch.io test
+.PHONY: magic magic.wasm lbxdump wasm itch.io test site
 
 magic:
 	go mod tidy
@@ -30,3 +30,10 @@ update:
 
 test:
 	go test ./...
+
+# the web site, with password-locked game data (see util/lock-data and web/index.html)
+site: wasm
+	test -f web/data.bin || (echo "web/data.bin is missing, make it with: go run ./util/lock-data -data <lbx directory>" && false)
+	mkdir -p site
+	cp magic.wasm web/index.html web/data.bin site/
+	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" site/

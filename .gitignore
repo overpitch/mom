@@ -15,6 +15,7 @@ data/data/*.LBX
 /magic
 /mapeditor
 *.wasm
+/site/
 
 # Memory and CPU profiles
 profile.cpu.*

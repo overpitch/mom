@@ -181,7 +181,7 @@ func CacheFromPath(path string) *LbxCache {
 func AutoCache() *LbxCache {
     // Find where the data is
     // 1. possibly use an embedded fs with all data in it, if it exists
-    // 2. check whats in the dropped files (for desktop and browsers)
+    // 2. check for data given to us by the web page, or whats in the dropped files (for desktop and browsers)
     // 3. check in the current working directory for all existing lbx files
     // 4. check all the directories in the current working directory to see if any of them contain lbx files
     // 5. look at all zip files in the current working directory to see if any of the zip files contain lbx files
@@ -189,6 +189,11 @@ func AutoCache() *LbxCache {
     embeddedCache := searchFs(data.Data, 2, "embedded")
     if embeddedCache != nil {
         return embeddedCache
+    }
+
+    browser := browserCache()
+    if browser != nil {
+        return browser
     }
 
     droppedFiles := ebiten.DroppedFiles()

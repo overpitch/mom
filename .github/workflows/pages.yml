@@ -1,0 +1,51 @@
+name: Publish web site
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build web site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+
+      - name: Set up go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '>=1.27.0'
+
+      - name: Build site
+        run: make site
+
+      - name: Set up pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: Deploy web site
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -290,8 +290,11 @@ func (main *MainScreen) MakeUI() *uilib.UI {
         },
     })
 
-    // TODO: when load game functionality is there, take save files presence into account for these vars
+    continuePath := ""
     isContinueBtnActive := false
+    if main.GameLoader != nil {
+        continuePath, isContinueBtnActive = gamemenu.MostRecentSave(main.GameLoader)
+    }
     isLoadGameBtnActive := true
 
     centerX := data.ScreenWidth / 2
@@ -304,7 +307,11 @@ func (main *MainScreen) MakeUI() *uilib.UI {
 
     // continue
     elements = append(elements, makeButton(centerX, yBase, "Continue", isContinueBtnActive, func(){
-        log.Printf("continue")
+        // the loader hands the loaded game to the main loop
+        err := main.GameLoader.LoadNew(continuePath)
+        if err != nil {
+            log.Printf("Unable to continue from %v: %v", continuePath, err)
+        }
     }))
 
     // load game

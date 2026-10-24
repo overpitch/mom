@@ -44,6 +44,23 @@ func saveFileName(index int) string {
     return fmt.Sprintf("file%d.magic-save", index)
 }
 
+/* the path of the save slot that was saved most recently, if any */
+func MostRecentSave(gameLoader GameLoader) (string, bool) {
+    var newest string
+    var newestDate time.Time
+
+    for index := 1; index <= 8; index++ {
+        path := saveFileName(index)
+        metadata, ok := gameLoader.LoadMetadata(path)
+        if ok && (newest == "" || metadata.Date.After(newestDate)) {
+            newest = path
+            newestDate = metadata.Date
+        }
+    }
+
+    return newest, newest != ""
+}
+
 func MakeGameMenuUI(cache *lbx.LbxCache, gameLoader GameLoader, saver GameSaver, settingsUI SettingsUI, doQuit func()) (*uilib.UIElementGroup, context.Context) {
     quit, cancel := context.WithCancel(context.Background())
 
